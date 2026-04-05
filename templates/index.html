@@ -1,0 +1,1195 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>FOTEX AI — Нейроредактор фото и видео</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: radial-gradient(circle at 10% 20%, #0f0c1f, #0a0815);
+            min-height: 100vh;
+            padding: 2rem;
+            color: #eef2ff;
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap');
+
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(16px);
+            border-radius: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 25px 40px -12px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .nav-menu {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 2rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.3rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #c4b5fd, #a78bfa);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-right: auto;
+        }
+
+        .brand i {
+            font-size: 1.5rem;
+            color: #a78bfa;
+            background: none;
+            -webkit-background-clip: unset;
+            background-clip: unset;
+        }
+
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.08);
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 2rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: #cbd5e6;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .nav-btn.active {
+            background: linear-gradient(135deg, #8b5cf6, #6366f1);
+            color: white;
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+        }
+
+        .page-content {
+            padding: 2rem;
+        }
+
+        .upload-area {
+            background: rgba(0, 0, 0, 0.3);
+            border: 2px dashed rgba(139, 92, 246, 0.6);
+            border-radius: 2rem;
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .upload-area:hover {
+            border-color: #8b5cf6;
+            background: rgba(139, 92, 246, 0.1);
+        }
+
+        .upload-area.has-photo {
+            padding: 1rem;
+        }
+
+        .upload-icon {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+            color: #a78bfa;
+        }
+
+        .photo-preview {
+            position: relative;
+            display: inline-block;
+        }
+
+        .photo-preview img {
+            max-width: 300px;
+            max-height: 250px;
+            border-radius: 1rem;
+            border: 2px solid #8b5cf6;
+            object-fit: cover;
+        }
+
+        .remove-photo {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: #ef4444;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            color: white;
+            transition: all 0.2s;
+        }
+
+        .remove-photo:hover {
+            background: #dc2626;
+            transform: scale(1.1);
+        }
+
+        .buttons-container {
+            min-height: 300px;
+            transition: all 0.3s ease;
+        }
+
+        .categories-grid, .subcategories-grid, .level3-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .category-btn, .subcategory-btn, .level3-btn {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1.2rem;
+            padding: 1.2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .category-btn:hover, .subcategory-btn:hover, .level3-btn:hover {
+            background: rgba(139, 92, 246, 0.2);
+            transform: translateY(-4px);
+            border-color: #8b5cf6;
+        }
+
+        .category-icon, .subcategory-icon, .level3-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            color: #c4b5fd;
+        }
+
+        .category-name, .subcategory-name, .level3-name {
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .category-desc {
+            font-size: 0.7rem;
+            opacity: 0.6;
+            margin-top: 0.3rem;
+        }
+
+        .back-button {
+            background: rgba(255, 255, 255, 0.08);
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 2rem;
+            color: white;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            transition: all 0.2s;
+        }
+
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        /* Модальное окно для ручного ввода */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: rgba(20, 20, 40, 0.95);
+            border-radius: 2rem;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+        }
+
+        .modal-content h3 {
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .modal-content textarea {
+            width: 100%;
+            padding: 1rem;
+            border-radius: 1rem;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            color: white;
+            font-family: inherit;
+            font-size: 0.9rem;
+            resize: vertical;
+            margin-bottom: 1rem;
+        }
+
+        .modal-content textarea:focus {
+            outline: none;
+            border-color: #8b5cf6;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+        }
+
+        .result-page {
+            padding: 2rem;
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .result-header h2 {
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .back-to-main {
+            background: rgba(255, 255, 255, 0.08);
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 2rem;
+            color: white;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s;
+        }
+
+        .back-to-main:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .result-comparison {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+
+        .result-item {
+            flex: 1;
+            min-width: 280px;
+            text-align: center;
+        }
+
+        .result-item img {
+            width: 100%;
+            max-width: 400px;
+            border-radius: 1rem;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            margin-top: 0.5rem;
+        }
+
+        .result-label {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #a78bfa;
+        }
+
+        .result-description-card {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1.2rem;
+            border-radius: 1rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .result-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+
+        .action-btn {
+            background: linear-gradient(135deg, #8b5cf6, #6366f1);
+            border: none;
+            padding: 0.7rem 1.5rem;
+            border-radius: 2rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .action-btn:hover {
+            transform: scale(0.98);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+        }
+
+        .action-btn.secondary {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .suggestions-section {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .suggestions-title {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .suggestions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 1rem;
+        }
+
+        .suggestion-card {
+            background: rgba(139, 92, 246, 0.1);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            border-radius: 1rem;
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .suggestion-card:hover {
+            background: rgba(139, 92, 246, 0.25);
+            transform: translateY(-4px);
+        }
+
+        .progress-container {
+            margin-top: 1rem;
+            width: 100%;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, #8b5cf6, #6366f1);
+            transition: width 0.3s;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 1.2rem;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #a78bfa;
+        }
+
+        .history-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 1rem;
+        }
+
+        .history-item {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 1rem;
+            overflow: hidden;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .history-item:hover {
+            transform: translateY(-4px);
+        }
+
+        .history-item img {
+            width: 100%;
+            height: 130px;
+            object-fit: cover;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+            .page-content, .result-page {
+                padding: 1rem;
+            }
+            .categories-grid, .subcategories-grid, .level3-grid, .suggestions-grid {
+                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            }
+            .brand span {
+                display: none;
+            }
+            .nav-menu {
+                padding: 0.75rem 1rem;
+                gap: 0.5rem;
+            }
+            .nav-btn {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="glass-card">
+        <div class="nav-menu">
+            <div class="brand">
+                <i class="fas fa-robot"></i>
+                <span>FOTEX AI</span>
+            </div>
+            <button class="nav-btn" data-page="home"><i class="fas fa-home"></i> Главная</button>
+            <button class="nav-btn" data-page="profile"><i class="fas fa-user"></i> Профиль</button>
+            <button class="nav-btn" data-page="history"><i class="fas fa-history"></i> История</button>
+            <button class="nav-btn" data-page="about"><i class="fas fa-info-circle"></i> О нас</button>
+        </div>
+
+        <div id="homePage" class="page-content">
+            <div id="uploadArea" class="upload-area">
+                <div id="emptyUploadState">
+                    <div class="upload-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+                    <div class="upload-text" style="font-size: 1.1rem;">Нажмите или перетащите фото</div>
+                    <div class="upload-hint" style="font-size: 0.8rem; opacity: 0.7;">JPG, PNG, WebP до 10 МБ</div>
+                </div>
+                <div id="photoPreviewState" class="hidden">
+                    <div class="photo-preview">
+                        <img id="photoPreviewImg" src="" alt="Загруженное фото">
+                        <button id="removePhotoBtn" class="remove-photo" title="Заменить фото"><i class="fas fa-times"></i></button>
+                    </div>
+                </div>
+                <input type="file" id="fileInput" accept="image/*" style="display: none;">
+            </div>
+
+            <div id="buttonsContainer" class="buttons-container"></div>
+        </div>
+
+        <div id="resultPage" class="result-page hidden">
+            <div class="result-header">
+                <h2><i class="fas fa-magic"></i> Результат обработки</h2>
+                <button id="backToHomeFromResult" class="back-to-main"><i class="fas fa-arrow-left"></i> Вернуться к категориям</button>
+            </div>
+            <div id="resultContent"></div>
+        </div>
+
+        <div id="profilePage" class="page-content hidden">
+            <h2><i class="fas fa-user-circle"></i> Профиль</h2>
+            <div class="stats-grid" id="profileStats"></div>
+            <div style="background: rgba(0,0,0,0.3); border-radius: 1.5rem; padding: 1.5rem;">
+                <h3><i class="fas fa-user-friends"></i> Приглашайте друзей</h3>
+                <div id="referralLink" style="background: #0f0f1a; padding: 0.8rem; border-radius: 1rem; margin: 1rem 0; word-break: break-all;">https://t.me/aifotex_bot?start=kx4BvFuG8NKCEy3I7d</div>
+                <button class="action-btn" onclick="copyReferralLink()"><i class="fas fa-copy"></i> Скопировать ссылку</button>
+                <div style="margin-top: 1rem; font-size: 0.85rem;">💡 Друг пополнил → вы +20%, друг друга → +10%</div>
+            </div>
+        </div>
+
+        <div id="historyPage" class="page-content hidden">
+            <h2><i class="fas fa-history"></i> История обработок</h2>
+            <div id="historyList" class="history-grid" style="margin-top: 1.5rem;"></div>
+        </div>
+
+        <div id="aboutPage" class="page-content hidden">
+            <h2>О FOTEX AI</h2>
+            <div style="background: rgba(255,255,255,0.05); border-radius: 1.5rem; padding: 1.5rem; margin-top: 1rem;">
+                <p>🤖 Современный сервис для обработки фото и видео с использованием искусственного интеллекта.</p>
+                <p>💎 1 клякса = 1 рубль. Пополняйте баланс и тратьте на обработки.</p>
+                <p>📞 Поддержка: @aifotex_support</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ==================== ДАННЫЕ ====================
+    let profileData = {
+        balance: 100, gift: 415, totalBalance: 515, generations: 63, videos: 2, expenses: 1115,
+        friends: 14, friendsFriends: 6, recharged: 0, bonus: 0, withdraw: 0
+    };
+    
+    let currentPhoto = null;
+    let currentPhotoUrl = null;
+    let currentLevel = 'main';      // 'main', 'level2', 'level3'
+    let currentCategoryId = null;    // id основной категории
+    let currentSubcategoryId = null;  // id подкатегории (уровень 2)
+    let currentTaskId = null;
+    let currentResultUrl = null;
+    let lastProcessedSubId = null;
+    let lastProcessedCategoryId = null;
+    let lastCustomPrompt = null;
+    let historyItems = [];
+    
+    // Основные категории (уровень 1)
+    const mainCategories = [
+        { id: 'documents', name: 'Фото на документы', icon: 'fas fa-id-card', desc: 'Подготовка, обрезка, фон' },
+        { id: 'background', name: 'Заменить или убрать фон', icon: 'fas fa-image', desc: 'Любой фон за секунды' },
+        { id: 'object', name: 'Убрать лишний объект', icon: 'fas fa-eraser', desc: 'Очистка кадра' },
+        { id: 'together', name: 'Совместное фото', icon: 'fas fa-users', desc: 'Собрать из нескольких' },
+        { id: 'restore', name: 'Восстановление фото', icon: 'fas fa-history', desc: 'Старые и сложные снимки' },
+        { id: 'style', name: 'Стилизация', icon: 'fas fa-palette', desc: 'Образ, мир, персонаж' },
+        { id: 'animate', name: 'Оживить кадр', icon: 'fas fa-film', desc: 'Короткое loop-видео' },
+        { id: 'manual', name: 'Ручная задача', icon: 'fas fa-pen', desc: 'По вашему описанию' }
+    ];
+    
+    // Подкатегории (уровень 2) с ручным вводом в КАЖДОЙ
+    const level2Categories = {
+        documents: {
+            title: 'Фото на документы',
+            categoryName: 'Фото на документы',
+            options: [
+                { id: 'manual_input', name: '✍️ Ручной ввод', desc: 'Опишите что нужно', icon: 'fas fa-pen', isManual: true },
+                { id: 'passport', name: '📘 Паспорт', desc: 'Стандартное фото на паспорт', icon: 'fas fa-passport' },
+                { id: 'international', name: '🌍 Загранпаспорт', desc: 'Для заграничного паспорта', icon: 'fas fa-globe' },
+                { id: 'visa', name: '🛂 Виза', desc: 'Для визовых документов', icon: 'fas fa-plane' },
+                { id: 'id_card', name: '🆔 Удостоверение', desc: 'Для пропуска или удостоверения', icon: 'fas fa-id-card' }
+            ]
+        },
+        background: {
+            title: 'Работа с фоном',
+            categoryName: 'Заменить или убрать фон',
+            options: [
+                { id: 'manual_input', name: '✍️ Ручной ввод', desc: 'Опишите какой фон нужен', icon: 'fas fa-pen', isManual: true },
+                { id: 'remove', name: '🗑️ Убрать фон', desc: 'Сделать фон прозрачным', icon: 'fas fa-eraser' },
+                { id: 'white', name: '⬜ Белый фон', desc: 'Заменить на белый', icon: 'fas fa-square' },
+                { id: 'nature', name: '🌿 Природа', desc: 'Заменить на природный фон', icon: 'fas fa-tree' },
+                { id: 'studio', name: '📸 Студия', desc: 'Профессиональный студийный фон', icon: 'fas fa-camera' }
+            ]
+        },
+        object: {
+            title: 'Удаление или замена объектов',
+            categoryName: 'Убрать лишний объект',
+            options: [
+                { id: 'manual_input', name: '✍️ Ручной ввод', desc: 'Опишите что убрать/заменить', icon: 'fas fa-pen', isManual: true },
+                { id: 'remove', name: '❌ Удалить объект', desc: 'Убрать лишний предмет', icon: 'fas fa-trash' },
+                { id: 'replace', name: '🔄 Заменить объект', desc: 'Заменить на другой', icon: 'fas fa-exchange-alt' }
+            ]
+        },
+        together: {
+            title: 'Совместное фото',
+            categoryName: 'Совместное фото',
+            options: [
+                { id: 'manual_input', name: '✍️ Ручной ввод', desc: 'Опишите с кем объединить', icon: 'fas fa-pen', isManual: true },
+                { id: 'friend', name: '👥 С другом', desc: 'Объединить два фото', icon: 'fas fa-user-friends' },
+                { id: 'celebrity', name: '⭐ Со звездой', desc: 'Вставить со знаменитостью', icon: 'fas fa-star' }
+            ]
+        },
+        restore: {
+            title: 'Восстановление фото',
+            categoryName: 'Восстановление фото',
+            options: [
+                { id: 'manual_input', name: '✍️ Ручной ввод', desc: 'Опишите что восстановить', icon: 'fas fa-pen', isManual: true },
+                { id: 'old', name: '🖼️ Старое фото', desc: 'Восстановить повреждённое', icon: 'fas fa-history' },
+                { id: 'dark', name: '🌙 Тёмное фото', desc: 'Осветлить и улучшить', icon: 'fas fa-sun' }
+            ]
+        },
+        style: {
+            title: 'Стилизация',
+            categoryName: 'Стилизация',
+            options: [
+                { id: 'manual_input', name: '✍️ Ручной ввод', desc: 'Опишите желаемый стиль', icon: 'fas fa-pen', isManual: true },
+                { id: 'life', name: '📸 Лайф', desc: 'Естественное фото', icon: 'fas fa-camera' },
+                { id: 'cinema', name: '🎬 Кино', desc: 'Кадр как из фильма', icon: 'fas fa-film' },
+                { id: 'games', name: '🎮 Игры', desc: 'Персонаж из игры', icon: 'fas fa-gamepad' }
+            ]
+        },
+        animate: {
+            title: 'Оживление кадра',
+            categoryName: 'Оживить кадр',
+            options: [
+                { id: 'manual_input', name: '✍️ Ручной ввод', desc: 'Опишите как оживить', icon: 'fas fa-pen', isManual: true },
+                { id: 'portrait', name: '🖼️ Оживший портрет', desc: 'Анимация лица', icon: 'fas fa-smile' },
+                { id: 'loop', name: '🔄 Loop-видео', desc: 'Короткое зацикленное видео', icon: 'fas fa-sync' }
+            ]
+        },
+        manual: {
+            title: 'Ручная задача',
+            categoryName: 'Ручная задача',
+            options: [
+                { id: 'manual_input', name: '✍️ Ручной ввод', desc: 'Опишите задачу', icon: 'fas fa-pen', isManual: true }
+            ]
+        }
+    };
+    
+    // Уровень 3 (детализация для некоторых подкатегорий)
+    const level3Categories = {
+        passport: {
+            title: 'Тип паспорта',
+            options: [
+                { id: 'passport_rf', name: '🇷🇺 Паспорт РФ', desc: '35x45 мм, строгий портрет' },
+                { id: 'passport_rf_international', name: '🌍 Загранпаспорт РФ', desc: '35x45 мм, цветной фон' },
+                { id: 'passport_eu', name: '🇪🇺 Паспорт ЕС', desc: 'Европейский стандарт' },
+                { id: 'passport_us', name: '🇺🇸 Паспорт США', desc: '2x2 дюйма' }
+            ]
+        },
+        international: {
+            title: 'Тип загранпаспорта',
+            options: [
+                { id: 'international_rf', name: '🇷🇺 Загранпаспорт РФ', desc: 'Стандартный' },
+                { id: 'international_biometric', name: '📱 Биометрический', desc: 'С чипом' }
+            ]
+        },
+        nature: {
+            title: 'Природный фон',
+            options: [
+                { id: 'nature_forest', name: '🌲 Лес', desc: 'Сосновый лес' },
+                { id: 'nature_sea', name: '🌊 Море', desc: 'Пляж и океан' },
+                { id: 'nature_mountains', name: '⛰️ Горы', desc: 'Горный пейзаж' },
+                { id: 'nature_sunset', name: '🌅 Закат', desc: 'Романтичный закат' }
+            ]
+        },
+        cinema: {
+            title: 'Киностиль',
+            options: [
+                { id: 'cinema_noir', name: '🎬 Нуар', desc: 'Чёрно-белый детектив' },
+                { id: 'cinema_blockbuster', name: '💥 Блокбастер', desc: 'Эпичный стиль' },
+                { id: 'cinema_arthouse', name: '🎨 Артхаус', desc: 'Художественный' }
+            ]
+        },
+        portrait: {
+            title: 'Тип анимации',
+            options: [
+                { id: 'animate_mimic', name: '😊 Мимика', desc: 'Улыбка и эмоции' },
+                { id: 'animate_lips', name: '👄 Движение губ', desc: 'Будто говорит' },
+                { id: 'animate_blink', name: '👁️ Моргание', desc: 'Естественное моргание' }
+            ]
+        }
+    };
+    
+    // Описания обработок
+    const processingDescriptions = {
+        passport_rf: '✅ Фото для паспорта РФ: размер 35x45 мм, нейтральный фон, строгий портрет.',
+        international_rf: '✅ Фото для загранпаспорта РФ: размер 35x45 мм, светлый фон.',
+        nature_forest: '✅ Фон заменён на лесной пейзаж.',
+        nature_sea: '✅ Фон заменён на морской пляж.',
+        cinema_noir: '✅ Стилизовано под нуарное кино: чёрно-белое, контрастное.',
+        animate_mimic: '✅ Добавлена мимика: персонаж улыбается и моргает.'
+    };
+    
+    // ==================== UI ФУНКЦИИ ====================
+    function updateProfileUI() {
+        const container = document.getElementById('profileStats');
+        if (container) {
+            container.innerHTML = `
+                <div class="stat-card"><div class="stat-value">${profileData.balance}🫟</div><div>Баланс</div></div>
+                <div class="stat-card"><div class="stat-value">${profileData.generations}</div><div>Генераций</div></div>
+                <div class="stat-card"><div class="stat-value">${profileData.friends}</div><div>Друзей</div></div>
+                <div class="stat-card"><div class="stat-value">${profileData.expenses}🫟</div><div>Расходы</div></div>
+            `;
+        }
+    }
+    
+    function goToHomeScreen() {
+        currentLevel = 'main';
+        currentCategoryId = null;
+        currentSubcategoryId = null;
+        document.getElementById('homePage').classList.remove('hidden');
+        document.getElementById('resultPage').classList.add('hidden');
+        document.getElementById('profilePage').classList.add('hidden');
+        document.getElementById('historyPage').classList.add('hidden');
+        document.getElementById('aboutPage').classList.add('hidden');
+        renderButtons();
+        updateActiveNav('home');
+    }
+    
+    function showHomePage() { goToHomeScreen(); }
+    function showProfilePage() {
+        document.getElementById('homePage').classList.add('hidden');
+        document.getElementById('resultPage').classList.add('hidden');
+        document.getElementById('profilePage').classList.remove('hidden');
+        document.getElementById('historyPage').classList.add('hidden');
+        document.getElementById('aboutPage').classList.add('hidden');
+        updateProfileUI();
+        updateActiveNav('profile');
+    }
+    function showHistoryPage() {
+        document.getElementById('homePage').classList.add('hidden');
+        document.getElementById('resultPage').classList.add('hidden');
+        document.getElementById('profilePage').classList.add('hidden');
+        document.getElementById('historyPage').classList.remove('hidden');
+        document.getElementById('aboutPage').classList.add('hidden');
+        updateHistoryUI();
+        updateActiveNav('history');
+    }
+    function showAboutPage() {
+        document.getElementById('homePage').classList.add('hidden');
+        document.getElementById('resultPage').classList.add('hidden');
+        document.getElementById('profilePage').classList.add('hidden');
+        document.getElementById('historyPage').classList.add('hidden');
+        document.getElementById('aboutPage').classList.remove('hidden');
+        updateActiveNav('about');
+    }
+    
+    function updateActiveNav(page) {
+        document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelector(`.nav-btn[data-page="${page}"]`)?.classList.add('active');
+    }
+    
+    function updateHistoryUI() {
+        const historyList = document.getElementById('historyList');
+        if (historyItems.length === 0) {
+            historyList.innerHTML = '<p style="grid-column:1/-1; text-align:center;">Пока нет обработанных фото</p>';
+        } else {
+            historyList.innerHTML = historyItems.map(item => `
+                <div class="history-item" onclick="window.open('${item.resultUrl}')">
+                    <img src="${item.resultUrl}" alt="Обработанное фото">
+                    <div style="padding: 0.5rem; font-size: 0.7rem;">${item.categoryName}</div>
+                </div>
+            `).join('');
+        }
+    }
+    
+    function addToHistory(resultUrl, categoryName) {
+        historyItems.unshift({ id: Date.now(), resultUrl, categoryName, date: new Date().toLocaleString() });
+        if (historyItems.length > 30) historyItems.pop();
+        updateHistoryUI();
+    }
+    
+    function showManualInputModal(categoryId, subcategoryInfo) {
+        const modal = document.createElement('div');
+        modal.className = 'modal-overlay';
+        modal.innerHTML = `
+            <div class="modal-content">
+                <h3><i class="fas fa-pen"></i> ${subcategoryInfo.name}</h3>
+                <p style="margin-bottom: 1rem; opacity: 0.7;">Опишите подробно, что вы хотите сделать с фото:</p>
+                <textarea id="manualPrompt" rows="5" placeholder="Пример: сделать фото на загранпаспорт, чтобы был нейтральный фон и лёгкая улыбка..."></textarea>
+                <div class="modal-actions">
+                    <button id="cancelManualBtn" class="action-btn secondary">Отмена</button>
+                    <button id="submitManualBtn" class="action-btn">Отправить</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        
+        document.getElementById('cancelManualBtn').onclick = () => modal.remove();
+        document.getElementById('submitManualBtn').onclick = () => {
+            const prompt = document.getElementById('manualPrompt').value.trim();
+            if (!prompt) {
+                alert('Пожалуйста, опишите вашу задачу');
+                return;
+            }
+            modal.remove();
+            startProcessing('manual_custom', prompt, categoryId);
+        };
+    }
+    
+    function renderButtons() {
+        const container = document.getElementById('buttonsContainer');
+        if (!container) return;
+        
+        if (currentLevel === 'main') {
+            container.innerHTML = `
+                <div class="categories-grid">
+                    ${mainCategories.map(cat => `
+                        <div class="category-btn" data-category="${cat.id}">
+                            <div class="category-icon"><i class="${cat.icon}"></i></div>
+                            <div class="category-name">${cat.name}</div>
+                            <div class="category-desc">${cat.desc}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const categoryId = btn.dataset.category;
+                    currentLevel = 'level2';
+                    currentCategoryId = categoryId;
+                    renderButtons();
+                });
+            });
+        } 
+        else if (currentLevel === 'level2' && currentCategoryId && level2Categories[currentCategoryId]) {
+            const level2 = level2Categories[currentCategoryId];
+            container.innerHTML = `
+                <button id="backToMainBtn" class="back-button"><i class="fas fa-arrow-left"></i> Назад к категориям</button>
+                <div class="subcategories-grid">
+                    ${level2.options.map(opt => `
+                        <div class="subcategory-btn" data-sub="${opt.id}" data-manual="${opt.isManual || false}">
+                            <div class="subcategory-icon"><i class="${opt.icon || 'fas fa-cog'}"></i></div>
+                            <div class="subcategory-name">${opt.name}</div>
+                            <div class="category-desc">${opt.desc}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            document.getElementById('backToMainBtn')?.addEventListener('click', () => {
+                currentLevel = 'main';
+                currentCategoryId = null;
+                renderButtons();
+            });
+            
+            document.querySelectorAll('.subcategory-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const subId = btn.dataset.sub;
+                    const isManual = btn.dataset.manual === 'true';
+                    const option = level2.options.find(opt => opt.id === subId);
+                    
+                    if (isManual) {
+                        showManualInputModal(currentCategoryId, option);
+                    } else if (level3Categories[subId]) {
+                        // Переход на уровень 3
+                        currentLevel = 'level3';
+                        currentSubcategoryId = subId;
+                        renderButtons();
+                    } else {
+                        // Сразу обработка
+                        startProcessing(subId, null, currentCategoryId);
+                    }
+                });
+            });
+        }
+        else if (currentLevel === 'level3' && currentSubcategoryId && level3Categories[currentSubcategoryId]) {
+            const level3 = level3Categories[currentSubcategoryId];
+            container.innerHTML = `
+                <button id="backToLevel2Btn" class="back-button"><i class="fas fa-arrow-left"></i> Назад</button>
+                <div class="level3-grid">
+                    ${level3.options.map(opt => `
+                        <div class="level3-btn" data-level3="${opt.id}">
+                            <div class="level3-icon">${opt.name.charAt(0)}</div>
+                            <div class="level3-name">${opt.name}</div>
+                            <div class="category-desc">${opt.desc}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            document.getElementById('backToLevel2Btn')?.addEventListener('click', () => {
+                currentLevel = 'level2';
+                currentSubcategoryId = null;
+                renderButtons();
+            });
+            
+            document.querySelectorAll('.level3-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const level3Id = btn.dataset.level3;
+                    startProcessing(level3Id, null, currentCategoryId);
+                });
+            });
+        }
+    }
+    
+    function startProcessing(editType, customPrompt = null, categoryId = null) {
+        if (!currentPhoto) {
+            alert('📸 Сначала загрузите фото!\nНажмите на область выше, чтобы выбрать изображение.');
+            return;
+        }
+        
+        lastCustomPrompt = customPrompt;
+        
+        const formData = new FormData();
+        formData.append('photo', currentPhoto);
+        formData.append('edit_type', editType);
+        if (customPrompt) {
+            formData.append('custom_prompt', customPrompt);
+        }
+        
+        document.getElementById('homePage').classList.remove('hidden');
+        document.getElementById('resultPage').classList.add('hidden');
+        
+        const buttonsContainer = document.getElementById('buttonsContainer');
+        const originalHtml = buttonsContainer.innerHTML;
+        buttonsContainer.innerHTML = `
+            <div style="text-align:center; padding:3rem;">
+                <div style="font-size:3rem; margin-bottom:1rem;">⏳</div>
+                <h3>Обработка фото...</h3>
+                <div class="progress-container">
+                    <div class="progress-bar">
+                        <div id="progressFill" class="progress-fill"></div>
+                    </div>
+                </div>
+                <p style="margin-top:1rem; opacity:0.7;">Это может занять 10-20 секунд</p>
+            </div>
+        `;
+        
+        fetch('/process', { method: 'POST', body: formData })
+            .then(response => response.json())
+            .then(data => {
+                currentTaskId = data.task_id;
+                checkStatus(editType, customPrompt);
+            })
+            .catch(error => {
+                buttonsContainer.innerHTML = originalHtml;
+                alert('Ошибка: ' + error.message);
+            });
+    }
+    
+    function checkStatus(editType, customPrompt) {
+        if (!currentTaskId) return;
+        
+        fetch(`/status/${currentTaskId}`)
+            .then(response => response.json())
+            .then(status => {
+                const progressFill = document.getElementById('progressFill');
+                if (progressFill && status.progress) {
+                    progressFill.style.width = status.progress + '%';
+                }
+                
+                if (status.status === 'completed') {
+                    currentResultUrl = status.result_url;
+                    
+                    let description = processingDescriptions[editType] || '✅ Фото успешно обработано с помощью искусственного интеллекта.';
+                    if (customPrompt) {
+                        description = `✅ По вашему запросу: «${customPrompt.substring(0, 100)}${customPrompt.length > 100 ? '...' : ''}»\n\n${description}`;
+                    }
+                    
+                    profileData.generations++;
+                    profileData.totalBalance -= 10;
+                    profileData.expenses += 10;
+                    updateProfileUI();
+                    
+                    addToHistory(status.result_url, editType);
+                    
+                    showResultPage(currentPhotoUrl, status.result_url, description, editType);
+                    
+                } else if (status.status === 'failed') {
+                    alert('Ошибка обработки: ' + (status.error || 'Неизвестная ошибка'));
+                    goToHomeScreen();
+                    renderButtons();
+                } else {
+                    setTimeout(() => checkStatus(editType, customPrompt), 2000);
+                }
+            })
+            .catch(error => {
+                alert('Ошибка при проверке статуса: ' + error.message);
+                goToHomeScreen();
+                renderButtons();
+            });
+    }
+    
+    function showResultPage(originalUrl, resultUrl, description, editType) {
+        const otherOptions = [];
+        const animateOptions = [
+            { id: 'animate_mimic', name: '😊 Оживший портрет', desc: 'Мимика и эмоции' },
+            { id: 'animate_loop', name: '🔄 Loop-видео', desc: 'Короткое видео' }
+        ];
+        
+        const suggestionsHtml = otherOptions.length > 0 ? `
+            <div class="suggestions-section">
+                <div class="suggestions-title"><i class="fas fa-lightbulb"></i> Другие обработки</div>
+                <div class="suggestions-grid">
+                    ${otherOptions.map(opt => `
+                        <div class="suggestion-card" data-sub="${opt.id}">
+                            <div class="suggestion-name">${opt.name}</div>
+                            <div class="suggestion-desc">${opt.desc}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        ` : '';
+        
+        const animateHtml = `
+            <div class="suggestions-section">
+                <div class="suggestions-title"><i class="fas fa-film"></i> Оживите свой кадр</div>
+                <div class="suggestions-grid">
+                    ${animateOptions.map(opt => `
+                        <div class="suggestion-card" data-sub="${opt.id}">
+                            <div class="suggestion-name">${opt.name}</div>
+                            <div class="suggestion-desc">${opt.desc}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+        
+        const resultHtml = `
+            <div class="result-comparison">
+                <div class="result-item">
+                    <div class="result-label">📷 Оригинал</div>
+                    <img src="${originalUrl}" alt="Оригинал">
+                </div>
+                <div class="result-item">
+                    <div class="result-label">✨ Результат обработки</div>
+                    <img src="${resultUrl}" alt="Результат">
+                </div>
+            </div>
+            <div class="result-description-card">
+                <i class="fas fa-info-circle"></i> ${description.replace(/\n/g, '<br>')}
+            </div>
+            <div class="result-actions">
+                <button id="downloadResultBtn" class="action-btn"><i class="fas fa-download"></i> Скачать результат</button>
+                <button id="newPhotoBtn" class="action-btn secondary"><i class="fas fa-plus"></i> Загрузить новое фото</button>
+            </div>
+            ${suggestionsHtml}
+            ${animateHtml}
+        `;
+        
+        document.getElementById('resultContent').innerHTML = resultHtml;
+        
+        document.getElementById('downloadResultBtn')?.addEventListener('click', () => downloadResult(resultUrl));
+        document.getElementById('newPhotoBtn')?.addEventListener('click', () => {
+            document.getElementById('fileInput').click();
+        });
+        
+        document.querySelectorAll('.suggestion-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const subId = card.dataset.sub;
+                startProcessing(subId, null, null);
+            });
+        });
+        
+        document.getElementById('homePage').classList.add('hidden');
+        document.getElementById('resultPage').classList.remove('hidden');
+    }
+    
+    function downloadResult(url) {
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'fotex_processed.jpg';
+        a.click();
+    }
+    
+    function setupPhotoUpload() {
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const emptyState = document.getElementById('emptyUploadState');
+        const previewState = document.getElementById('photoPreviewState');
+        const previewImg = document.getElementById('photoPreviewImg');
+        const removeBtn = document.getElementById('removePhotoBtn');
+        
+        uploadArea.addEventListener('click', () => fileInput.click());
+        uploadArea.addEventListener('dragover', (e) => { e.preventDefault(); uploadArea.style.borderColor = '#a78bfa'; });
+        uploadArea.addEventListener('dragleave', () => { uploadArea.style.borderColor = 'rgba(139, 92, 246, 0.6)'; });
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            const file = e.dataTransfer.files[0];
+            if (file && file.type.startsWith('image/')) handleNewPhoto(file);
+        });
+        
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files[0]) handleNewPhoto(e.target.files[0]);
+        });
+        
+        removeBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (confirm('🔄 Заменить фото? Текущий результат будет очищен.')) {
+                fileInput.click();
+            }
+        });
+        
+        function handleNewPhoto(file) {
+            if (currentPhoto && !confirm('Заменить фото? Текущий результат будет очищен.')) return;
+            
+            currentPhoto = file;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                currentPhotoUrl = e.target.result;
+                previewImg.src = currentPhotoUrl;
+                emptyState.classList.add('hidden');
+                previewState.classList.remove('hidden');
+                uploadArea.classList.add('has-photo');
+                goToHomeScreen();
+                renderButtons();
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+    
+    function copyReferralLink() {
+        const link = document.getElementById('referralLink').innerText;
+        navigator.clipboard.writeText(link);
+        alert('Ссылка скопирована!');
+    }
+    
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const page = btn.dataset.page;
+            if (page === 'home') showHomePage();
+            else if (page === 'profile') showProfilePage();
+            else if (page === 'history') showHistoryPage();
+            else if (page === 'about') showAboutPage();
+        });
+    });
+    
+    document.getElementById('backToHomeFromResult')?.addEventListener('click', () => {
+        goToHomeScreen();
+        renderButtons();
+    });
+    
+    window.copyReferralLink = copyReferralLink;
+    
+    setupPhotoUpload();
+    updateProfileUI();
+    showHomePage();
+    renderButtons();
+</script>
+</body>
+</html>
