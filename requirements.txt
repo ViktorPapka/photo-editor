@@ -4,3 +4,5 @@ Pillow
 Werkzeug
 gunicorn
 requests
+sqlalchemy
+psycopg2-binary
