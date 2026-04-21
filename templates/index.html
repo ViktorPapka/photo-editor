@@ -277,6 +277,178 @@
             .nav-menu { padding: 0.75rem 1rem; gap: 0.5rem; }
             .nav-btn { padding: 0.4rem 0.8rem; font-size: 0.8rem; }
         }
+	  /* ========== НОВЫЕ УЛУЧШЕНИЯ ИНТЕРФЕЙСА ========== */
+        
+        /* Анимация появления кнопок */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .category-btn, .subcategory-btn, .level3-btn {
+            animation: fadeInUp 0.3s ease backwards;
+        }
+        
+        /* Плавное появление карточек с задержкой */
+        .category-btn:nth-child(1) { animation-delay: 0.00s; }
+        .category-btn:nth-child(2) { animation-delay: 0.03s; }
+        .category-btn:nth-child(3) { animation-delay: 0.06s; }
+        .category-btn:nth-child(4) { animation-delay: 0.09s; }
+        .category-btn:nth-child(5) { animation-delay: 0.12s; }
+        .category-btn:nth-child(6) { animation-delay: 0.15s; }
+        .category-btn:nth-child(7) { animation-delay: 0.18s; }
+        .category-btn:nth-child(8) { animation-delay: 0.21s; }
+        
+        /* Улучшенные карточки */
+        .category-btn, .subcategory-btn, .level3-btn {
+            transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+        }
+        
+        .category-btn:hover, .subcategory-btn:hover, .level3-btn:hover {
+            transform: translateY(-6px) scale(1.02);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* Тосты (уведомления) */
+        .toast-notification {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(12px);
+            padding: 12px 24px;
+            border-radius: 48px;
+            border-left: 4px solid #8b5cf6;
+            color: white;
+            font-size: 14px;
+            font-weight: 500;
+            z-index: 10000;
+            animation: toastSlideIn 0.3s ease forwards;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        @keyframes toastSlideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        @keyframes toastSlideOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
+        
+        .toast-notification.success { border-left-color: #10b981; }
+        .toast-notification.error { border-left-color: #ef4444; }
+        .toast-notification.info { border-left-color: #3b82f6; }
+        
+        /* Улучшенная кнопка загрузки */
+        .upload-area {
+            transition: all 0.3s ease;
+        }
+        
+        .upload-area:hover {
+            transform: scale(1.01);
+            box-shadow: 0 10px 30px rgba(139, 92, 246, 0.2);
+        }
+        
+        /* Улучшенный прогресс-бар */
+        .progress-bar {
+            background: rgba(255, 255, 255, 0.15);
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+        
+        .progress-fill {
+            background: linear-gradient(90deg, #8b5cf6, #6366f1, #8b5cf6);
+            background-size: 200% auto;
+            animation: shimmer 1.5s ease infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        /* Стили для примера работ (будет добавлен позже) */
+        .examples-section {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .examples-title {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .examples-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+        
+        .example-card {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 1rem;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .example-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+        
+        .example-images {
+            display: flex;
+            position: relative;
+        }
+        
+        .example-images img {
+            width: 50%;
+            height: 120px;
+            object-fit: cover;
+        }
+        
+        .example-arrow {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #8b5cf6;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+        
+        .example-title {
+            padding: 0.8rem;
+            font-size: 0.85rem;
+            text-align: center;
+        }
+        
+        /* Адаптивные улучшения */
+        @media (max-width: 768px) {
+            .toast-notification {
+                bottom: 20px;
+                right: 20px;
+                left: 20px;
+                border-radius: 40px;
+                text-align: center;
+                justify-content: center;
+            }
+        }
     </style>
 </head>
 <body>
@@ -567,7 +739,7 @@
         document.getElementById('cancelManualBtn').onclick = () => modal.remove();
         document.getElementById('submitManualBtn').onclick = () => {
             const prompt = document.getElementById('manualPrompt').value.trim();
-            if (!prompt) { alert('Пожалуйста, опишите задачу'); return; }
+            if (!prompt) { showToast('Пожалуйста, опишите задачу', 'error'); return; }
             modal.remove();
             startProcessing('manual_custom', prompt);
         };
@@ -700,7 +872,7 @@
     
     function startProcessing(editType, customPrompt = null) {
         if (!currentPhoto) { 
-            alert('📸 Сначала загрузите фото!'); 
+            showToast('📸 Сначала загрузите фото!', 'error'); 
             return; 
         }
         
@@ -801,7 +973,7 @@
     function copyReferralLink() {
         const link = document.getElementById('referralLink').innerText;
         navigator.clipboard.writeText(link);
-        alert('Ссылка скопирована!');
+        showToast('Ссылка скопирована!', 'success');
     }
     
     // ========== АВТОРИЗАЦИЯ (ДЕМО-РЕЖИМ) ==========
@@ -868,6 +1040,35 @@
     // Показываем экран авторизации (бэкенда нет)
     document.getElementById('authScreen').style.display = 'flex';
     document.getElementById('mainInterface').style.display = 'none';
+	 // ========== ТОСТЫ (ВКЛЮЧАЯ ЗАПАСНОЙ ALERT) ==========
+    function showToast(message, type = 'info') {
+        // Создаём элемент тоста
+        const toast = document.createElement('div');
+        toast.className = `toast-notification ${type}`;
+        
+        let icon = '';
+        if (type === 'success') icon = '<i class="fas fa-check-circle"></i>';
+        else if (type === 'error') icon = '<i class="fas fa-exclamation-circle"></i>';
+        else icon = '<i class="fas fa-info-circle"></i>';
+        
+        toast.innerHTML = `${icon} <span>${message}</span>`;
+        document.body.appendChild(toast);
+        
+        // Удаляем через 3 секунды
+        setTimeout(() => {
+            toast.style.animation = 'toastSlideOut 0.3s ease forwards';
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }
+    
+    // Перехват alert для показа тостов (alert остаётся как запасной вариант)
+    const originalAlert = window.alert;
+    window.alert = function(message) {
+        // Показываем тост
+        showToast(message, 'info');
+        // Запасной alert (можно раскомментировать, если нужно)
+        // originalAlert(message);
+    };
 </script>
 </body>
 </html>
